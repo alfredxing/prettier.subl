@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "yarn run tsc -p tsconfig.json",
+    "watch": "yarn run tsc -w -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.4"
+  }
+}
