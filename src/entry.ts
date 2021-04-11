@@ -19,7 +19,7 @@ async function run() {
 	}
 
 	const config = await prettier.resolveConfig(filePath);
-	res(
+	await res(
 		prettier.formatWithCursor(source, {
 			...config,
 			parser: fileInfo.inferredParser,

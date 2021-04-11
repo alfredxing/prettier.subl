@@ -8,8 +8,13 @@ export function skip(reason: string) {
 	process.exit(0);
 }
 
-export function res(result: { formatted: string }) {
-	process.stdout.write(JSON.stringify(result));
+export async function res(result: { formatted: string }) {
+	const done = process.stdout.write(JSON.stringify(result));
+	if (!done) {
+		await new Promise((resolve) => {
+			process.stdout.on('drain', resolve);
+		});
+	}
 	process.exit(0);
 }
 
