@@ -2,7 +2,7 @@ import * as resolve from './resolve';
 import { error, skip, res, readInput } from './io';
 
 async function run() {
-	const { filePath, source } = await readInput();
+	const { filePath, source, cursorOffset } = await readInput();
 
 	if (!filePath) {
 		error('No file path passed in');
@@ -19,12 +19,13 @@ async function run() {
 	}
 
 	const config = await prettier.resolveConfig(filePath);
-	const formatted = prettier.format(source, {
-		parser: fileInfo.inferredParser,
-		...config,
-	});
-
-	res({ formatted });
+	res(
+		prettier.formatWithCursor(source, {
+			...config,
+			parser: fileInfo.inferredParser,
+			cursorOffset,
+		})
+	);
 }
 
 run();

@@ -2,12 +2,14 @@ import os
 import subprocess
 import sys
 import json
+import time
 
 import sublime
 import sublime_plugin
 
 LOG_PREFIX = "[PRETTIER]"
 PACKAGE_PATH = os.path.dirname(os.path.realpath(__file__))
+DEBUG = True
 
 class Prettier(sublime_plugin.EventListener):
 	def on_pre_save(self, view):
@@ -15,6 +17,7 @@ class Prettier(sublime_plugin.EventListener):
 
 class PrettierCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
+		start = time.time()
 		view = self.view
 		region = sublime.Region(0, view.size())
 		source = view.substr(region)
@@ -27,6 +30,7 @@ class PrettierCommand(sublime_plugin.TextCommand):
 		stdin = json.dumps({
 			"filePath": view.file_name(),
 			"source": source,
+			"cursorOffset": view.sel()[0].a if len(view.sel()) > 0 else 0,
 		})
 		entry = os.path.join(PACKAGE_PATH, "dist/entry.js")
 		cmd = [node, entry]
@@ -41,7 +45,15 @@ class PrettierCommand(sublime_plugin.TextCommand):
 			return
 
 		formatted = res["formatted"]
+		cursor_offset = res["cursorOffset"]
+
+		if (formatted == source):
+			return
+
 		view.replace(edit, region, formatted)
+		view.sel().clear()
+		view.sel().add(sublime.Region(cursor_offset))
+		log_debug("Formatting timing", time.time() - start)
 
 def which(exe):
 	def is_exe(path):
@@ -59,3 +71,7 @@ def log(*args):
 
 def log_error(*args):
 	print(LOG_PREFIX, *args, file=sys.stderr)
+
+def log_debug(*args):
+	if DEBUG:
+		print(LOG_PREFIX, *args)
