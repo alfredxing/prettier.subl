@@ -9,7 +9,7 @@ import sublime_plugin
 
 LOG_PREFIX = "[PRETTIER]"
 PACKAGE_PATH = os.path.dirname(os.path.realpath(__file__))
-DEBUG = True
+DEBUG = False
 
 class Prettier(sublime_plugin.EventListener):
 	def on_pre_save(self, view):
@@ -41,6 +41,8 @@ class PrettierCommand(sublime_plugin.TextCommand):
 			return
 
 		res = json.loads(proc.stdout)
+		log_debug("Got result", res)
+
 		if "skip" in res:
 			return
 

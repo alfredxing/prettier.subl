@@ -3,9 +3,8 @@ export function error(message: string) {
 	process.exit(1);
 }
 
-export function skip(message: string) {
-	process.stdout.write(JSON.stringify({ skip: true }));
-	process.stderr.write(message);
+export function skip(reason: string) {
+	process.stdout.write(JSON.stringify({ skip: true, reason }));
 	process.exit(0);
 }
 
