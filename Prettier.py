@@ -1,5 +1,7 @@
 import os
 import subprocess
+import sys
+import json
 
 import sublime
 import sublime_plugin
@@ -13,15 +15,33 @@ class Prettier(sublime_plugin.EventListener):
 
 class PrettierCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
+		view = self.view
+		region = sublime.Region(0, view.size())
+		source = view.substr(region)
+
 		node = which("node")
 		if node is None:
-			print(LOG_PREFIX, "Error: can't find node executable")
+			log_error("Error: can't find node executable")
 			return
 
+		stdin = json.dumps({
+			"filePath": view.file_name(),
+			"source": source,
+		})
 		entry = os.path.join(PACKAGE_PATH, "dist/entry.js")
-		cmd = [node, entry, self.view.file_name()]
-		proc = subprocess.run(cmd, capture_output=True, encoding="utf-8")
-		print(proc.stdout)
+		cmd = [node, entry]
+		proc = subprocess.run(cmd, input=stdin, capture_output=True, encoding="utf-8")
+
+		if (proc.returncode > 0):
+			log_error(proc.stderr)
+			return
+
+		res = json.loads(proc.stdout)
+		if "skip" in res:
+			return
+
+		formatted = res["formatted"]
+		view.replace(edit, region, formatted)
 
 def which(exe):
 	def is_exe(path):
@@ -33,3 +53,9 @@ def which(exe):
 			return path
 
 	return None
+
+def log(*args):
+	print(LOG_PREFIX, *args)
+
+def log_error(*args):
+	print(LOG_PREFIX, *args, file=sys.stderr)

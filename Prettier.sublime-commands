@@ -1,6 +1,6 @@
 [
 	{
 		"caption": "Prettier",
-		"command": "prettier",
-	},
+		"command": "prettier"
+	}
 ]
