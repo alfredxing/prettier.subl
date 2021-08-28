@@ -18,6 +18,10 @@ async function run() {
 		skip('File is ignored or has no parser');
 	}
 
+	if (fileInfo.inferredParser === 'less') {
+		skip('Not formatting LESS file');
+	}
+
 	const config = await prettier.resolveConfig(filePath);
 	await res(
 		prettier.formatWithCursor(source, {
