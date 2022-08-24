@@ -18,9 +18,9 @@ export async function getPrettier(filePath: string) {
 }
 
 async function findModule(filePath: string, module: string) {
-	const parts = filePath.split('/');
+	const parts = filePath.split(path.sep);
 	for (let level = parts.length - 1; level >= 1; level--) {
-		const dir = parts.slice(0, level).join('/');
+		const dir = parts.slice(0, level).join(path.sep);
 		try {
 			const packageJsonPath = path.join(dir, 'package.json');
 			await fs.promises.access(packageJsonPath, fs.constants.R_OK);

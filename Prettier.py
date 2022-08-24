@@ -22,7 +22,7 @@ class PrettierCommand(sublime_plugin.TextCommand):
 		region = sublime.Region(0, view.size())
 		source = view.substr(region)
 
-		node = which("node")
+		node = which("node") or which("node.exe")
 		if node is None:
 			log_error("Error: can't find node executable")
 			return
@@ -34,7 +34,7 @@ class PrettierCommand(sublime_plugin.TextCommand):
 		})
 		entry = os.path.join(PACKAGE_PATH, "dist/entry.js")
 		cmd = [node, entry]
-		proc = subprocess.run(cmd, input=stdin, capture_output=True, encoding="utf-8")
+		proc = subprocess.run(cmd, input=stdin, capture_output=True, encoding="utf-8", shell=True)
 
 		if (proc.returncode > 0):
 			log_error(proc.stderr)
