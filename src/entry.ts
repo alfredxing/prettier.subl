@@ -24,11 +24,13 @@ async function run() {
 
 	const config = await prettier.resolveConfig(filePath);
 	await res(
-		prettier.formatWithCursor(source, {
-			...config,
-			parser: fileInfo.inferredParser,
-			cursorOffset,
-		})
+		await Promise.resolve(
+			prettier.formatWithCursor(source, {
+				...config,
+				parser: fileInfo.inferredParser,
+				cursorOffset,
+			}),
+		),
 	);
 }
 
